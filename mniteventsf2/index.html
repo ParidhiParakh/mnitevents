@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'></text></svg>">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-blue: #3b82f6;
+      --primary-blue-dark: #2563eb;
+      --accent-yellow: #fbbf24;
+      --accent-yellow-dark: #f59e0b;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --border-color: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+      --text-primary: #f9fafb;
+      --text-secondary: #9ca3af;
+      --bg-primary: #1f2937;
+      --bg-secondary: #111827;
+      --bg-tertiary: #374151;
+      --border-color: #4b5563;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 16px;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      margin-bottom: 24px;
+      background: var(--bg-primary);
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--primary-blue);
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .theme-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-primary);
+    }
+
+    .theme-toggle:hover {
+      background: var(--border-color);
+      transform: translateY(-1px);
+    }
+
+    .icons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .icon {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .icon:hover {
+      background: var(--border-color);
+      transform: translateY(-1px);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    .menu-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--bg-primary);
+      min-width: 200px;
+      box-shadow: var(--shadow-lg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      z-index: 1000;
+      margin-top: 4px;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+      font-size: 0.9rem;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    .events-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-primary);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .events-table th,
+    .events-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .events-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .events-table td {
+      color: var(--text-primary);
+    }
+
+    .events-table tbody tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .download-btn {
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+      margin-right: 8px;
+    }
+
+    .download-btn:hover {
+      background: var(--primary-blue-dark);
+      transform: translateY(-1px);
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .back-btn {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: var(--border-color);
+      transform: translateY(-1px);
+    }
+
+    .main-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+      color: white;
+      padding: 16px 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .event-card {
+      background: var(--bg-primary);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .event-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--accent-yellow));
+    }
+
+    .event-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .event-meta {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .event-desc {
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .register-btn {
+      background: linear-gradient(135deg, var(--accent-yellow), var(--accent-yellow-dark));
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #1f2937;
+      transition: all 0.2s ease;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+
+    .register-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    #user-form {
+      display: none;
+      margin-top: 24px;
+      background: var(--bg-primary);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    #user-form h3 {
+      margin-bottom: 24px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    input {
+      padding: 14px 16px;
+      margin: 8px 0 16px 0;
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .form-btn {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .notification-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: var(--bg-primary);
+      box-shadow: var(--shadow-lg);
+      border-left: 1px solid var(--border-color);
+      z-index: 10000;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .notification-panel.show {
+      right: 0;
+    }
+
+    .notification-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notification-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 5px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .notification-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .notification-item:hover {
+      background: var(--bg-secondary);
+    }
+
+    .notification-item.unread {
+      background: rgba(59, 130, 246, 0.05);
+      border-left: 4px solid var(--primary-blue);
+    }
+
+    .notification-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .notification-message {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .notification-time {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+      }
+
+      header {
+        padding: 16px 20px;
+        margin-bottom: 20px;
+      }
+
+      .main-buttons {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+
+      .btn {
+        padding: 14px 20px;
+        font-size: 0.95rem;
+      }
+
+      .events-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .event-card {
+        padding: 20px;
+      }
+
+      .event-meta {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      #user-form {
+        padding: 24px;
+        margin-top: 20px;
+      }
+
+      .theme-toggle {
+        padding: 6px 10px;
+        font-size: 1rem;
+      }
+
+      .icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+      }
+
+      .notification-panel {
+        width: 100%;
+        right: -100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-controls {
+        gap: 8px;
+      }
+
+      .theme-toggle span:last-child {
+        display: none;
+      }
+
+      .event-title {
+        font-size: 1.1rem;
+      }
+
+      .events-grid {
+        gap: 12px;
+      }
+
+      .event-card {
+        padding: 16px;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .event-card {
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    /* Loading state */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">MNIT Events</div>
+      <div class="header-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span id="theme-icon">🌙</span>
+          <span>Dark</span>
+        </button>
+        <div class="icons">
+          <span class="icon" title="Notifications" onclick="toggleNotifications()">
+            🔔
+            <span id="notification-badge" class="notification-badge" style="display: none;">0</span>
+          </span>
+          <div class="menu-dropdown">
+            <span class="icon" title="Menu" onclick="toggleDropdown()">⋮</span>
+            <div id="dropdown-menu" class="dropdown-content">
+              <div class="dropdown-item" onclick="showHostedEvents()">📋 My Hosted Events</div>
+              <div class="dropdown-item" onclick="showMyRegistrations()">📝 My Registered Events</div>
+              <div class="dropdown-item" onclick="logout()">🚪 Logout</div>
+              <div class="dropdown-item" onclick="showAbout()">ℹ️ About</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-buttons">
+      <button class="btn" onclick="showEvents()">📅 View Events</button>
+      <button class="btn" onclick="postEvent()">➕ Post Event</button>
+    </div>
+
+    <div id="events-list" class="events-grid">
+      <!-- Events will be loaded here -->
+    </div>
+
+    <div id="user-form">
+      <h3>🎓 MNIT Events - Login Required</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px; text-align: center;">
+        Please provide all details below. A verification link will be sent to your MNIT email.
+      </p>
+      <div id="login-step-1">
+        <input type="text" id="name" placeholder="Full Name *" required />
+        <input type="text" id="roll" placeholder="College Roll Number *" required />
+        <input type="tel" id="mobile" placeholder="Mobile Number *" required />
+        <input type="email" id="email" placeholder="MNIT Email (@mnit.ac.in) *" required />
+        <button class="btn form-btn" onclick="sendSignInLinkWithDetails()">Send Login Link & Verify Email</button>
+      </div>
+      <div id="login-loading" style="display: none; text-align: center; padding: 20px;">
+        <p>Sending verification link to your email...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Panel -->
+  <div id="notification-panel" class="notification-panel">
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <button class="close-btn" onclick="toggleNotifications()">×</button>
+    </div>
+    <div id="notifications-list">
+      <!-- Notifications will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Firebase SDK v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
